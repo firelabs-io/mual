@@ -20,5 +20,6 @@ runs shells command (any)
 \! 
 
 meta date (like run only _ if is unix or nt)
-
+\<\if \cond> \</\if>
+will check if cond is true, if yes then execute, else will not
 thats it

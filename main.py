@@ -35,6 +35,7 @@ if __name__ == "__main__":
     os_type = 'nt' if os.name == 'nt' else 'unix'
     execute_section = None
     last_input = None
+    condition_met = False
 
     for line in program:
         if line.startswith('#'):
@@ -55,12 +56,22 @@ if __name__ == "__main__":
                 execute_section = 'unix'
             else:
                 execute_section = None
+        elif line.startswith('<if') and line.endswith('>'):
+            condition = line[4:-1].strip()
+            if last_input == condition:
+                condition_met = True
+            else:
+                condition_met = False
+        elif line.startswith('</if>'):
+            condition_met = False
         elif line.startswith('<') and line.endswith('>'):
             command = line[1:-1].strip()
-            if execute_section:
+            if execute_section and condition_met:
                 if last_input is not None:
                     command = command.replace('&', last_input)
                 execute_shell_command(command)
         else:
+            # Handle escaped characters
             line = line.replace('\\#', '#').replace('\\$', '$').replace('\\&', '&').replace('\\<', '<').replace('\\>', '>')
-            print(line)
+            if condition_met or execute_section:
+                print(line)
